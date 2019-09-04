@@ -18,9 +18,19 @@ namespace GmailTest
         static string emailToAddress = "dopicokoga@gmail.com"; //Receiver Email Address  
         static string subject = "Hello";
         static string body = "Hello, This is Email sending test using gmail.";
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
-            SendEmail();
+            try
+            {
+                SendEmail();
+                Console.WriteLine($"Seccussful");
+                return 0;
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine($"Error : {exc.Message}");
+                return 1;
+            }
         }
         public static void SendEmail()
         {
@@ -36,16 +46,9 @@ namespace GmailTest
                 {
                     smtp.Credentials = new NetworkCredential(emailFromAddress, password);
                     smtp.EnableSsl = enableSSL;
-                    try
-                    {
 
-                        smtp.Send(mail);
-                    }
-                    catch (Exception exc)
-                    {
-                        Console.WriteLine($"Error : {exc.Message}");
-                    }
-                    Console.WriteLine($"Seccussful");
+                    smtp.Send(mail);
+
                 }
             }
         }
