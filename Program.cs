@@ -44,7 +44,6 @@ namespace GmailTest
                     catch (Exception exc)
                     {
                         Console.WriteLine($"Error : {exc.Message}");
-                        throw;
                     }
                     Console.WriteLine($"Seccussful");
                 }
