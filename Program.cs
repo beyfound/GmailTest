@@ -29,7 +29,7 @@ namespace GmailTest
             catch (Exception exc)
             {
                 Console.WriteLine($"Error : {exc.Message}");
-                Environment.Exit(0);
+                Environment.Exit(-1);
             }
         }
         public static void SendEmail()
