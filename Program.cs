@@ -12,14 +12,14 @@ namespace GmailSender
             {
                 using (MailMessage mail = new MailMessage())
                 {
-                    mail.From = new MailAddress(args[0]);
-                    mail.To.Add(args[2]);
-                    mail.Subject = args[3];
-                    mail.Body = args[4];
+                    mail.From = new MailAddress(args[0], args[1]);
+                    mail.To.Add(args[3]);
+                    mail.Subject = args[4];
+                    mail.Body = args[5];
                     mail.IsBodyHtml = true;
                     using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
                     {
-                        smtp.Credentials = new NetworkCredential(args[0], args[1]);
+                        smtp.Credentials = new NetworkCredential(args[0], args[2]);
                         smtp.EnableSsl = true;
                         smtp.Send(mail);
 
