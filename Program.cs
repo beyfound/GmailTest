@@ -18,18 +18,18 @@ namespace GmailTest
         static string emailToAddress = "dopicokoga@gmail.com"; //Receiver Email Address  
         static string subject = "Hello";
         static string body = "Hello, This is Email sending test using gmail.";
-        static int Main(string[] args)
+        static void Main(string[] args)
         {
             try
             {
                 SendEmail();
                 Console.WriteLine($"Seccussful");
-                return 0;
+                Environment.Exit(0);
             }
             catch (Exception exc)
             {
                 Console.WriteLine($"Error : {exc.Message}");
-                return 1;
+                Environment.Exit(0);
             }
         }
         public static void SendEmail()
