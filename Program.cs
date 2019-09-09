@@ -38,7 +38,7 @@ namespace GmailSender
 
         static readonly string imapHost = "imap.gmail.com";
         static readonly string smtpHost = "smtp.gmail.com";
-        static string senderName = "Joe Customer";
+        static readonly string senderName = "Joe Customer";
         static void Main(string[] args)
         {
             InitParameter(args);
