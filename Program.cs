@@ -28,12 +28,11 @@ namespace GmailSender
             Find
         }
         static string FromAddress { get; set; }
-        static string FromPassword { get; set; }
+        static string Password { get; set; }
         static string ToAddress { get; set; }
         static string FromName { get; set; }
         static string Subject { get; set; }
         static string Body { get; set; }
-        static string FindString { get; set; }
         static string ActionType { get; set; }
 
         static readonly string imapHost = "imap.gmail.com";
@@ -50,6 +49,7 @@ namespace GmailSender
                         SendMessage();
                         break;
                     case "Reply":
+
                         Reply();
                         break;
                     case "Find":
@@ -73,12 +73,11 @@ namespace GmailSender
         {
             ActionType = args[0];
             FromAddress = args[1];
-            FromPassword = args[2];
+            Password = args[2];
             FromName = args[3];
             ToAddress = args[4];
             Subject = args[5];
             Body = args[6];
-            FindString = args[7];
         }
 
         private static void SendMessage()
@@ -92,7 +91,7 @@ namespace GmailSender
                 mail.IsBodyHtml = true;
                 using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
                 {
-                    smtp.Credentials = new NetworkCredential(FromAddress, FromPassword);
+                    smtp.Credentials = new NetworkCredential(FromAddress, Password);
                     smtp.EnableSsl = true;
                     smtp.Send(mail);
 
@@ -111,11 +110,11 @@ namespace GmailSender
 
         private static void FindMessageBySubject()
         {
-            ImapClient client = ConnectIMAP(FromAddress, FromPassword);
+            ImapClient client = ConnectIMAP(ToAddress, Password);
             // Find messages that were sent from abc@def.com and have the string "Hello World" in their subject line.
             IEnumerable<uint> uids = client.Search(SearchCondition.Unseen().And(SearchCondition.From(FromAddress)).And(SearchCondition.Subject(Subject)));
 
-            if( uids.Count() !=1)
+            if (uids.Count() != 1)
             {
                 throw new Exception($"Find {uids.Count()} messages matchs address: {FromAddress}, subject:{Subject}");
             }
@@ -235,7 +234,7 @@ namespace GmailSender
                 client.EnableSsl = true;
                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                 client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential(FromAddress, FromPassword);
+                client.Credentials = new NetworkCredential(FromAddress, Password);
                 ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
                 { return true; };
                 // Send
@@ -272,7 +271,7 @@ namespace GmailSender
         public static void Reply()
         {
             // Download unread messages from the server
-            IEnumerable<MailMessage> messages = GetUnseenMessages(FromAddress, FromPassword);
+            IEnumerable<MailMessage> messages = GetUnseenMessages(FromAddress, Password);
             if (messages != null)
             {
 
