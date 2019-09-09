@@ -51,7 +51,7 @@ namespace GmailSender
             try
             {
                 string actionType = args[0];
-                Dictionary<string, string> parameters = (Dictionary<string, string>)JsonConvert.DeserializeObject(args[1]);
+                Dictionary<string, string> parameters = JsonConvert.DeserializeObject<Dictionary<string, string>>(args[1]);
                 switch (actionType)
                 {
                     case "Create":
