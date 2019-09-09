@@ -234,7 +234,7 @@ namespace GmailSender
                 client.EnableSsl = true;
                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                 client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential(FromAddress, Password);
+                client.Credentials = new NetworkCredential(ToAddress, Password);
                 ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
                 { return true; };
                 // Send
@@ -271,7 +271,7 @@ namespace GmailSender
         public static void Reply()
         {
             // Download unread messages from the server
-            IEnumerable<MailMessage> messages = GetUnseenMessages(FromAddress, Password);
+            IEnumerable<MailMessage> messages = GetUnseenMessages(ToAddress, Password);
             if (messages != null)
             {
 
