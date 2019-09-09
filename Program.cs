@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using S22.Imap;
+﻿using S22.Imap;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,40 +34,30 @@ namespace GmailSender
         static string Subject { get; set; }
         static string Body { get; set; }
         static string FindString { get; set; }
-
-        private static readonly string SendAddressParamName = "SENDER_ADDRESS";
-        private static readonly string SendPwdParamName = "SENDER_PASSWORD";
-        private static readonly string ReceiveAddressParamName = "RECEIVER_ADDRESS";
-        private static readonly string EmailSubjectParamName = "EMAIL_SUBJECT";
-        private static readonly string EmailBodyParamName = "EMAIL_BODY";
-        private static readonly string SenderDisplayParamName = "SENDER_DISPLAY";
+        static string ActionType { get; set; }
 
         static readonly string imapHost = "imap.gmail.com";
         static readonly string smtpHost = "smtp.gmail.com";
         static string senderName = "Joe Customer";
         static void Main(string[] args)
         {
+            InitParameter(args);
+
             try
             {
-                string actionType = args[0];
-                Dictionary<string, string> parameters = JsonConvert.DeserializeObject<Dictionary<string, string>>(args[1]);
-                switch (actionType)
+                switch (ActionType)
                 {
                     case "Create":
-                        FromAddress = parameters[SendAddressParamName];
-                        FromPassword = parameters[SendPwdParamName];
-                        FromName = parameters[SenderDisplayParamName];
-                        ToAddress = parameters[ReceiveAddressParamName];
-                        Subject = parameters[EmailSubjectParamName];
-                        Body = parameters[EmailBodyParamName];
-                        sendMessage();
+                        SendMessage();
                         break;
                     case "Reply":
+                        Reply();
                         break;
                     case "Find":
+                        FindMessageBySubject();
                         break;
                     default:
-                        Console.WriteLine($"Cannot find this this action type: {args[0]}.");
+                        Console.WriteLine($"Cannot find this this action type: {ActionType}.");
                         Environment.Exit(-1);
                         break;
                 }
@@ -79,27 +68,21 @@ namespace GmailSender
                 Environment.Exit(-1);
             }
 
-            FromAddress = "dopicokoga@gmail.com";
-            FromPassword = "qt89454262";
-            //FromName = args[0];
-            //ToAddress = args[0];
-            //Subject = args[0];
-            //Body = args[0];
-            //try
-            //{
-            //    //sendMessage();
-
-            //    FindMessageBySubject("");
-            //    //Environment.Exit(0);
-            //}
-            //catch (Exception exc)
-            //{
-            //    Console.WriteLine($"Error : {exc.Message}");
-            //    Environment.Exit(-1);
-            //}
         }
 
-        private static void sendMessage()
+        private static void InitParameter(string[] args)
+        {
+            ActionType = args[0];
+            FromAddress = args[1];
+            FromPassword = args[2];
+            FromName = args[3];
+            ToAddress = args[4];
+            Subject = args[5];
+            Body = args[6];
+            FindString = args[7];
+        }
+
+        private static void SendMessage()
         {
             using (MailMessage mail = new MailMessage())
             {
@@ -127,13 +110,18 @@ namespace GmailSender
             return uids.Count();
         }
 
-        private static int FindMessageBySubject(string sSubject, string emailAddress, string password)
+        private static void FindMessageBySubject()
         {
-            ImapClient client = ConnectIMAP(emailAddress, password);
+            ImapClient client = ConnectIMAP(FromAddress, FromPassword);
             // Find messages that were sent from abc@def.com and have the string "Hello World" in their subject line.
-            IEnumerable<uint> uids = client.Search(SearchCondition.Unseen().And(SearchCondition.From("st.customer01@gmail.com")).And(SearchCondition.Subject("Hello")));
+            IEnumerable<uint> uids = client.Search(SearchCondition.Unseen().And(SearchCondition.From(FromAddress)).And(SearchCondition.Subject(Subject)));
 
-            return uids.Count();
+            if( uids.Count() !=1)
+            {
+                throw new Exception($"Find {uids.Count()} messages matchs address: {FromAddress}, subject:{Subject}");
+            }
+
+            Console.WriteLine("Find message by subject successfully!");
         }
         public static IEnumerable<MailMessage> GetUnseenMessages(string emailAddress, string password)
         {
@@ -160,9 +148,9 @@ namespace GmailSender
 
         }
 
-        private static MailMessage CreateReply(MailMessage source, string emailAddress)
+        private static MailMessage CreateReply(MailMessage source)
         {
-            MailMessage reply = new MailMessage(new MailAddress(emailAddress, "Sender"), source.From);
+            MailMessage reply = new MailMessage(new MailAddress(FromAddress, "Sender"), source.From);
 
             // Get message id and add 'In-Reply-To' header
             string id = source.Headers["Message-ID"];
@@ -240,7 +228,7 @@ namespace GmailSender
             return reply;
         }
 
-        public static void SendReplies(IEnumerable<MailMessage> replies, string sCustomerEmail, string sCustomerPassword)
+        public static void SendReplies(IEnumerable<MailMessage> replies)
         {
             using (SmtpClient client = new SmtpClient(smtpHost, 587)) //465, 587
             {
@@ -248,7 +236,7 @@ namespace GmailSender
                 client.EnableSsl = true;
                 client.DeliveryMethod = SmtpDeliveryMethod.Network;
                 client.UseDefaultCredentials = false;
-                client.Credentials = new NetworkCredential(sCustomerEmail, sCustomerPassword);
+                client.Credentials = new NetworkCredential(FromAddress, FromPassword);
                 ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
                 { return true; };
                 // Send
@@ -282,10 +270,10 @@ namespace GmailSender
             }
         }
 
-        public static void Reply(string sCustomerEmail, string sCustomerPassword)
+        public static void Reply()
         {
             // Download unread messages from the server
-            IEnumerable<MailMessage> messages = GetUnseenMessages(sCustomerEmail, sCustomerPassword);
+            IEnumerable<MailMessage> messages = GetUnseenMessages(FromAddress, FromPassword);
             if (messages != null)
             {
 
@@ -293,12 +281,12 @@ namespace GmailSender
                 List<MailMessage> replies = new List<MailMessage>();
                 foreach (MailMessage msg in messages)
                 {
-                    replies.Add(CreateReply(msg, sCustomerEmail));
+                    replies.Add(CreateReply(msg));
                     msg.Dispose();
                 }
 
                 // Send replies
-                SendReplies(replies, sCustomerEmail, sCustomerPassword);
+                SendReplies(replies);
             }
             else
             {
