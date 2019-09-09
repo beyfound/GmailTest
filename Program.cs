@@ -42,6 +42,7 @@ namespace GmailSender
         static void Main(string[] args)
         {
             InitParameter(args);
+
             try
             {
                 switch (ActionType)
