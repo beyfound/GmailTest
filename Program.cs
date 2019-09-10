@@ -12,15 +12,6 @@ namespace GmailSender
 {
     class Program
     {
-        //-sAdr sender username
-        //-pwd
-        //-sDisplay
-        //-rAdr
-        //- sub
-        //-body
-        // -s
-        //- f reply 
-        // -r
         public enum Type
         {
             Create,
@@ -49,7 +40,6 @@ namespace GmailSender
                         SendMessage();
                         break;
                     case "Reply":
-
                         Reply();
                         break;
                     case "Find":
@@ -148,7 +138,7 @@ namespace GmailSender
 
         private static MailMessage CreateReply(MailMessage source)
         {
-            MailMessage reply = new MailMessage(new MailAddress(FromAddress, "Sender"), source.From);
+            MailMessage reply = new MailMessage(new MailAddress(ToAddress, "Sender"), source.From);
 
             // Get message id and add 'In-Reply-To' header
             string id = source.Headers["Message-ID"];
