@@ -31,9 +31,9 @@ namespace GmailSender
         static readonly string senderName = "Joe Customer";
         static void Main(string[] args)
         {
-            InitParameter(args);
             try
             {
+                InitParameter(args);
                 switch (ActionType)
                 {
                     case "Create":
@@ -228,25 +228,16 @@ namespace GmailSender
                 ServicePointManager.ServerCertificateValidationCallback = delegate (object s, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
                 { return true; };
                 // Send
-                bool retry = true;
                 foreach (MailMessage msg in replies)
                 {
                     try
                     {
                         client.Send(msg.From.ToString(), msg.To.ToString(), msg.Subject, msg.Body);
-                        retry = true;
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("Exception: " + ex.Message);
-                        if (!retry)
-                        {
-                            Console.WriteLine("Failed to send email reply to " + msg.To.ToString() + '.');
-                            Console.WriteLine("Exception: " + ex.Message);
-                            return;
-                        }
-
-                        retry = false;
+                        Console.WriteLine("Failed to send email reply to " + msg.To.ToString() + '.');
+                        throw new Exception($"Send reply failed: {ex.Message}");
                     }
                     finally
                     {
@@ -278,7 +269,8 @@ namespace GmailSender
             }
             else
             {
-                Console.WriteLine("No new email messages.");
+                Console.WriteLine("Could not find any unread email messages.");
+                Environment.Exit(-1);
             }
         }
     }
