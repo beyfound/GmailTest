@@ -12,12 +12,6 @@ namespace GmailSender
 {
     class Program
     {
-        public enum Type
-        {
-            Create,
-            Reply,
-            Find
-        }
         static string FromAddress { get; set; }
         static string Password { get; set; }
         static string ToAddress { get; set; }
