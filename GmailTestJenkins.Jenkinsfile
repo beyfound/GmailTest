@@ -2,13 +2,13 @@ pipeline {
     agent any
     
 	parameters {
-		choice( name :'ACTION_TYPE' choices: ['Create', 'Reply', 'Find'] description: 'the build action type')
-		string( name : 'SENDER_ADDRESS' defaultValue: "st.customer01@gmail.com", description:'')
-		string( name : 'ADDRESS_PASSWORD' defaultValue: "Forgerock1", description:'')
-		string( name : 'SENDER_DISPLAY' defaultValue: "st.customer", description:'')
-		string( name : 'RECEIVER_ADDRESS' defaultValue: "dopicokoga@gmail.com", description:'')
-		string( name : 'EMAIL_SUBJECT' defaultValue: "Hello", description:'')
-		string( name : 'EMAIL_BODY' defaultValue: "hello, how are you", description:'')
+		choice( name :'ACTION_TYPE', choices: ['Create', 'Reply', 'Find'], description: 'the build action type')
+		string( name : 'SENDER_ADDRESS', defaultValue: "st.customer01@gmail.com", description:'')
+		string( name : 'ADDRESS_PASSWORD', defaultValue: "Forgerock1", description:'')
+		string( name : 'SENDER_DISPLAY', defaultValue: "st.customer", description:'')
+		string( name : 'RECEIVER_ADDRESS', defaultValue: "dopicokoga@gmail.com", description:'')
+		string( name : 'EMAIL_SUBJECT', defaultValue: "Hello", description:'')
+		string( name : 'EMAIL_BODY', defaultValue: "hello, how are you", description:'')
 	}
     options {
         timeout(1)
